@@ -1,0 +1,238 @@
+<?xml version='1.0'?>
+<!-- Density of Aluminium 2710 kg/m3 -->
+<!-- Density of Plastic 970 kg/m3 -->
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name = "SCARA_T7">
+  <xacro:property name="PI" value="3.14159" />
+  <xacro:macro name="link_cylinder" params="density rad len xyz:='0 0 0' rpy:='0 0 0'" >
+    <inertial>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <mass value="${PI*rad*rad*len*density}" />
+      <inertia ixx="${PI*rad*rad*len*density*(3.0*rad**3+len**2)/12.0 }" ixy="0.0" ixz="0.0"
+               iyy="${PI*rad*rad*len*density*(3.0*rad**3+len**2)/12.0 }" iyz="0.0"
+               izz="${PI*rad*rad*len*density*(3.0*rad**3+len**2)/12.0 }" />
+    </inertial>
+
+    <visual>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <geometry>
+        <cylinder radius="${rad}" length="${len}"/>
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <geometry>
+        <cylinder radius="${rad}" length="${len}"/>
+      </geometry>
+    </collision>
+
+  </xacro:macro>
+
+  <xacro:macro name="link_sphere" params="density rad xyz:='0 0 0' rpy:='0 0 0'" >
+    
+    <inertial>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <mass value="${4/3*PI*rad**3*density}" />
+      <inertia ixx="${2*4/3*PI*rad**3*density*rad**2/5.0}" ixy="0.0" ixz="0.0"
+               iyy="${2*4/3*PI*rad**3*density*rad**2/5.0}" iyz="0.0"
+               izz="${2*4/3*PI*rad**3*density*rad**2/5.0}" />
+    </inertial>
+
+    <visual>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <geometry>
+        <sphere radius="${rad}" />
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <geometry>
+        <sphere radius="${rad}" />
+      </geometry>
+    </collision>
+
+  </xacro:macro>
+
+  <xacro:macro name="link_cube" params="density len xyz:='0 0 0' rpy:='0 0 0'" >
+    
+    <inertial>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <mass value="${len**3*density}" />
+      <inertia ixx="${len**3*density*len**2/6.0}" ixy="0.0" ixz="0.0"
+               iyy="${len**3*density*len**2/6.0}" iyz="0.0"
+               izz="${len**3*density*len**2/6.0}" />
+    </inertial>
+
+    <visual>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <geometry>
+        <box size = "${len} ${len} ${len}" />
+      </geometry>
+    </visual>
+
+    <collision>
+      <origin xyz="${xyz}" rpy="${rpy}"/>
+      <geometry>
+        <box size = "${len} ${len} ${len}" />
+      </geometry>
+    </collision>
+
+  </xacro:macro>
+
+  <link name="world"/>
+
+  <joint name="Joint_0" type="fixed">
+    <parent link="world"/>
+    <child link="Link_0"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name = "Link_0">
+    <xacro:link_cylinder density="2710" rad="0.05" len= "0.05" xyz="0 0 0.025" rpy="0 0 0"/>
+  </link>
+
+  <joint name="Joint_1" type="revolute">
+    <parent link="Link_0"/>
+    <child link="Link_1"/>
+    <origin xyz="0 0 0.05" rpy="0 0 0"/>
+    <limit effort="30.0" lower="0" upper="0" velocity="5.0"/> 
+    <axis xyz="0 0 1"/>
+    <!-- <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface> -->
+  </joint>
+
+  <link name = "Link_1">
+  	<xacro:link_cylinder density="2710" rad="0.03" len= "0.15" xyz="0 0 0.075" rpy="0 0 0"/>
+  </link>
+
+  <joint name="Joint_1A" type="fixed">
+    <parent link="Link_1"/>
+    <child link="Link_1B"/>
+    <origin xyz="0 0 0.15" rpy="0 0 0"/>
+  </joint>
+
+  <link name = "Link_1B">
+  	<xacro:link_sphere density="970" rad="0.03" xyz="0 0 0" rpy="0 0 0"/>
+  </link>
+
+  <joint name="Joint_1B" type="fixed">
+    <parent link="Link_1B"/>
+    <child link="Link_1C"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <link name = "Link_1C">
+  	<xacro:link_cylinder density="2710" rad="0.03" len= "0.2" xyz="0.1 0 0" rpy="0 ${PI/2} 0"/>
+  </link>
+
+  <joint name="Joint_1C" type="revolute">
+    <parent link="Link_1C"/>
+    <child link="Link_1D"/>
+    <origin xyz="0.2 0 0" rpy="0 0 0"/>
+    <limit effort="30.0" lower="0" upper="0" velocity="5.0"/> 
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name = "Link_1D">
+  	<xacro:link_cylinder density="970" rad="0.04" len= "0.07" xyz="0 0 0" rpy="0 0 0"/>
+  </link>
+
+  <joint name="Joint_2" type="revolute">
+    <parent link="Link_1D"/>
+    <child link="Link_2"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <limit effort="30.0" lower="0" upper="0" velocity="5.0"/> 
+    <axis xyz="0 0 1"/>
+    <!-- <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface> -->
+  </joint>
+
+  <link name = "Link_2">
+  	<xacro:link_cylinder density="2710" rad="0.02" len= "0.2" xyz="0.1 0 0" rpy="0 ${PI/2} 0"/>
+  </link>
+
+  <joint name="Joint_2A" type="revolute">
+    <parent link="Link_2"/>
+    <child link="Link_2A"/>
+    <origin xyz="0.2 0 0" rpy="${PI} 0 0"/>
+    <limit effort="30.0" lower="0" upper="0" velocity="5.0"/> 
+    <axis xyz="0 0 1"/>
+  </joint>
+
+  <link name = "Link_2A">
+  	<xacro:link_cube density="970" len= "0.06" xyz="0 0 0" rpy="0 0 0"/>
+  </link>
+
+  <joint name="Joint_3" type="prismatic">
+    <parent link="Link_2A"/>
+    <child link="Link_3"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <limit effort="30.0" lower="-0.03" upper="0.03" velocity="5.0"/> 
+    <axis xyz="0 0 1"/>
+    <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+  </joint>
+
+  <link name = "Link_3">
+  	<xacro:link_cylinder density="2710" rad="0.01" len= "0.1" xyz="0 0 0.05" rpy="0 0 0"/>
+  </link>
+
+  <gazebo reference="Link_0">
+    <material>Gazebo/Red</material>
+  </gazebo>
+  <gazebo reference="Link_1">
+    <material>Gazebo/Green</material>
+  </gazebo>
+  <gazebo reference="Link_1D">
+    <material>Gazebo/Red</material>
+  </gazebo>
+  <gazebo reference="Link_2">
+    <material>Gazebo/Green</material>
+  </gazebo>
+  <gazebo reference="Link_2A">
+    <material>Gazebo/Red</material>
+  </gazebo>
+  <gazebo reference="Link_3">
+    <material>Gazebo/Green</material>
+  </gazebo>
+
+  <!-- Plugin for the controller -->
+  <gazebo>
+      <plugin filename="libgazebo_ros_control.so" name="gazebo_ros_control">
+        <robotNamespace>/SCARA_T7</robotNamespace>
+        <robotSimType>gazebo_ros_control/DefaultRobotHWSim</robotSimType>
+        <legacyModeNS>true</legacyModeNS>
+      </plugin>
+  </gazebo>
+
+  <!-- <transmission name="tran1">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="Joint_1">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="Motor_1">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+
+  <transmission name="tran2">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="Joint_2">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="Motor_2">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission> -->
+
+  <transmission name="tran3">
+    <type>transmission_interface/SimpleTransmission</type>
+    <joint name="Joint_3">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+    </joint>
+    <actuator name="Motor_3">
+      <hardwareInterface>hardware_interface/EffortJointInterface</hardwareInterface>
+      <mechanicalReduction>1</mechanicalReduction>
+    </actuator>
+  </transmission>
+</robot>
